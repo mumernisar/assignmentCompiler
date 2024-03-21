@@ -4,6 +4,7 @@ import subprocess
 import os 
 import shell
 
+
 print("""
 
      ____  _____ _____ ____   ____  ____   ___ ___    ___  ____   ______ 
@@ -45,10 +46,7 @@ def printOutputs(filename , x , y):
     file.write(data[filename])
     file.close()
     time.sleep(2)
-    os.system(f'start cmd /K cd output')
-    time.sleep(2)
-    pyautogui.write('code .')
-    pyautogui.press('enter')
+    os.system(f'start cmd /K "cd output && code ."')
     time.sleep(2)
     pyautogui.hotkey('ctrl' , 'k')
     pyautogui.hotkey('ctrl' , 'w')
@@ -80,14 +78,14 @@ def printOutputs(filename , x , y):
             docTitle = title
             break
     doc =  pyautogui.getWindowsWithTitle(docTitle)[0] 
+    time.sleep(3)
     doc.activate()
-    time.sleep(2)
-    doc.activate()
+    
 
     pyautogui.hotkey('ctrl','end')
     pyautogui.write(f"{filename.split('.')[0]} Output : ")
     pyautogui.hotkey('enter')
-
+    time.sleep(2)
     pyautogui.hotkey('ctrl','v')
     pyautogui.hotkey('enter')
     pyautogui.hotkey('ctrl' , 'return')
@@ -130,6 +128,7 @@ for file in os.listdir(directory):
         if(fileType in acceptableOuts):
 
             getOuts(filename)
+            # print('getting output' ,  filename)
 
     # ///////////////// READ DATA FROM LOG AND STORE IN VARIABLE
 if(fileType in acceptableOuts):
@@ -143,15 +142,15 @@ if(fileType in acceptableOuts):
 # /////////////    MAIN SCRIPT
 x = -1
 y = -1
-print(files , 'files')
+
 def script():
     firstTime = True
 
-    for index ,filename in enumerate(files):
+    for filename in files:
         subprocess.call("TASKKILL /F /IM cmd.exe", shell=True)
         subprocess.call("TASKKILL /F /IM Code.exe", shell=True)
 
-        if filename == "script.py": continue
+        if filename == "script.py" or filename == "shell.py": continue
 
         os.system(f'start cmd /K "cd files && code {filename}"')
         time.sleep(3)
@@ -197,20 +196,24 @@ def script():
                     f = open("template.docx", "x")
                     time.sleep(1)
                     subprocess.call('powershell.exe Unblock-File -Path ./template.docx  ; exit', shell=True)
-                    time.sleep(1)
+                    time.sleep(2)
                     f.close()
                     os.startfile("template.docx")
-                    
-                time.sleep(2)
 
-        titles = pyautogui.getAllTitles()
-        docTitle = ''
-        for title in titles:
-            if 'Word' in title:
-                docTitle = title
+                    
+        for i in range(10):
+            titles = pyautogui.getAllTitles()
+            if 'Word' in titles:
+                docTitle = ''
+                for title in titles:
+                    if 'Word' in title:
+                        docTitle = title
+                        break
+                doc =  pyautogui.getWindowsWithTitle(docTitle)[0] 
+                doc.activate()
                 break
-        doc =  pyautogui.getWindowsWithTitle(docTitle)[0] 
-        doc.activate()
+            else:
+                time.sleep(1)
 
         pyautogui.hotkey('ctrl','end')
         pyautogui.write(f"{filename.split('.')[0]}")
